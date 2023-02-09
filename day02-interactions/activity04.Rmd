@@ -78,3 +78,25 @@ m_bty_rank <- lm(score ~ bty_avg + rank, data = evals)
 tidy(m_bty_rank)
 ```
 
+# Day 2
+
+```{R}
+m_int <- lm(score ~ bty_avg * gender, data = evals)
+tidy(m_int)
+glance(m_int)
+glance(m_bty_gen)
+```
+
+  1. This is the interaction effect of bty_avg when the gender of the person is male.
+  2. a) males:   y_hat = 3.767 + 0.1102*bty_avg
+     b) females: y_hat = 3.95 + 0.0306*bty_avg
+  3. females -> however this will change due to the interaction term. If the bty_avg is low it will remain female, if it is high it will eventually change to male
+  4. Overall, I would say that this model does not fit the population well. The p-value for both the bty_avg and gender are well above an alpha of 0.05 or 0.1 so we would think to remove them from the model. 
+
+```{R}
+ggplot() +
+  geom_point(aes(x = bty_avg, y = score, color = gender), data = evals) +
+  geom_smooth(aes(x = bty_avg, y = score), method = "lm", data = m_bty_gen, color = "green") +
+  geom_smooth(aes(x = bty_avg, y = score), method = "lm", data = m_int, color = "red")
+```
+
