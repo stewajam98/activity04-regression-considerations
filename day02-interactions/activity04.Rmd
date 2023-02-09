@@ -1,0 +1,80 @@
+---
+title: "Activity 4 - Day 1"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(tidymodels)
+library(GGally)
+library(PerformanceAnalytics)
+```
+
+## Loading in the Data
+
+```{R, warnings=FALSE}
+evals <- readr::read_delim("https://www.openintro.org/data/tab-delimited/evals.txt")
+
+evals %>%
+  ggplot(aes(x = score)) +
+  geom_histogram()
+```
+
+  1. Observational study. They did not assign these individuals for the experiment and control for the professors looks. They observed the results afterwards.
+  2. The data for score looks skewed to the left.
+  3. See following code chunk. It looks like upper level classes have more students.
+
+```{R}
+evals %>%
+  ggplot(aes(x = cls_level, y = cls_students)) +
+  geom_col()
+```
+
+
+## Pairwise Relationships
+
+```{R}
+evals %>%
+  select(contains("bty")) %>%
+  ggpairs()
+```
+
+  4. They seem to all be positively correlated and have either a linear or curvalinear relationship.
+  5. It does not make sense to have all of these variables in the same model because they would be describing the same variance.
+  6. I would only include the bty_avg variable as it seems to be strongly correlated with all of the other variables. If I was to add another variable, it would have to be bty_m2upp as it is the least correlated with the bty_avg.
+  
+## Task 5 - One Quant, One Qual Variable
+
+```{R}
+m_bty_gen <- lm(score ~ bty_avg + gender, data = evals)
+tidy(m_bty_gen)
+```
+
+  7. See code chunk below. Overall, it looks skewed to the left. This could mean that a transformation on the data might yield a better model. Constant variance and linearity don't seem to be much of an issue.
+  
+```{R}
+# obtain fitted values and residuals
+m_bty_aug <- augment(m_bty_gen)
+
+# plot fitted values and residuals
+ggplot(data = m_bty_aug, aes(x = .fitted, y = .resid)) + 
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  xlab("Fitted values") +
+  ylab("Residuals")
+
+ggplot(data = m_bty_aug, aes(x = .resid)) +
+  geom_histogram(binwidth = 0.25) +
+  xlab("Residual")
+```
+
+  8. Both bty_avg and gender seem to be significant predictors of score.
+  9. yhat = 3.919 + 0.07415*bty_avg
+  10. males tend to receive higher score. You can tell because gendermale's beta value is positive.
+
+```{R}
+m_bty_rank <- lm(score ~ bty_avg + rank, data = evals)
+tidy(m_bty_rank)
+```
+
