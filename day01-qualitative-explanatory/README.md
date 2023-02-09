@@ -1,4 +1,4 @@
-Day 1 - Fitting a MLR Model
+Day 1 - Qualitative Explanatory Variables
 ================
 
 In this repository/directory you should see two items:
